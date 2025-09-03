@@ -27,39 +27,39 @@ The following files contain the absolute requirements. They are listed in order 
 
 ### 2.1. Core Architecture & Process (Highest Precedence)
 
-* **`PROJECT_GUIDE.md`** | **[DOWNLOAD](https://2030b.com/md/PROJECT_GUIDE.md)**
+* **`PROJECT_GUIDE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md)**
   * **Purpose:** The constitution of the project. Defines coding standards, naming conventions, and architectural patterns.
   * **Agent Action:** This file **OVERRULES** all others in matters of style and structure. **MUST** be consulted first for every task.
 
-* **`PROJECT_PROCESS.md`** | **[DOWNLOAD](https://2030b.com/md/PROJECT_PROCESS.md)**  
+* **`PROJECT_PROCESS.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/PROJECT_PROCESS.md)**  
   * **Purpose:** The master workflow and chronological playbook for code generation.
   * **Agent Action:** Refer to this to understand the current step's context, dependencies, and required output files.
 
-* **`ARCHITECTURE_DECISIONS.md`** | **[DOWNLOAD](https://2030b.com/md/ARCHITECTURE_DECISIONS.md)**
+* **`ARCHITECTURE_DECISIONS.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/ARCHITECTURE_DECISIONS.md)**
   * **Purpose:** Rationale for key technical choices (Laravel, Packages, API design). Provides context.
   * **Agent Action:** Consult to understand the *intent* behind the architecture. Ensure generated code aligns with this philosophy.
 
 ### 2.2. Data Layer Specifications (Non-Negotiable)
 
-* **`DATABASE_SCHEMA_V2.md`** | **[DOWNLOAD](https://2030b.com/md/DATABASE_SCHEMA_V2.md)**
+* **`DATABASE_SCHEMA_V2.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/DATABASE_SCHEMA_V2.md)**
   * **Purpose:** The single source of truth for all database structures (tables, columns, types, relationships).
   * **Agent Action:** **MANDATORY** for generating Migrations, Models, and any data access logic. Column names, types, and relationships defined here are **FINAL**.
 
-* **`APP_MODEL.md`** | **[DOWNLOAD](https://2030b.com/md/APP_MODEL.md)**
+* **`APP_MODEL.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/APP_MODEL.md)**
   * **Purpose:** Specifies the exact properties, relationships, methods, and accessors for each Eloquent Model.
   * **Agent Action:** Generate Model classes **DIRECTLY** from this spec. **CROSS-REFERENCE** with `DATABASE_SCHEMA_V2.md`.
 
-* **`APP_ENUM.md`** | **[DOWNLOAD](https://2030b.com/md/APP_ENUM.md)**
+* **`APP_ENUM.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/APP_ENUM.md)**
   * **Purpose:** Defines all type-safe PHP Enumerations (e.g., statuses, types, categories).
   * **Agent Action:** Generate PHP Enums exactly as listed. Use these enums in Models, DTOs, Services, and Policies where referenced.
 
-* **`APP_DTO.md`** | **[DOWNLOAD](https://2030b.com/md/APP_DTO.md)**
+* **`APP_DTO.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/APP_DTO.md)**
   * **Purpose:** Defines all Data Transfer Objects (DTOs) for strict, validated data contracts between application layers.
   * **Agent Action:** Generate DTO classes with properties, types, and validation rules as specified. These are immutable data objects.
 
 ### 2.3. Implementation & Interface Guides
 
-* **`PACKAGES.md`** | **[DOWNLOAD](https://2030b.com/md/PACKAGES.md)**
+* **`PACKAGES.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/PACKAGES.md)**
   * **Purpose:** Authoritative list of all approved Composer and NPM dependencies.
   * **Agent Action:** **ONLY** use classes, methods, and patterns from these approved packages. Do not assume a package is included.
 
@@ -79,17 +79,17 @@ The following files contain the absolute requirements. They are listed in order 
 > - Laravel Telescope (debugging)
 > - PHPUnit & Pest (testing frameworks)
 
-* **`API_GUIDE.md`** | **[DOWNLOAD](https://2030b.com/md/API_GUIDE.md)**
+* **`API_GUIDE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/API_GUIDE.md)**
   * **Purpose:** The contract for all API endpoints (URLs, methods, request/response formats).
   * **Agent Action:** Generate Controllers, Form Requests, and API Resources to implement this contract **exactly**.
 
-* **`FRONTEND_GUIDE.md`** | **[DOWNLOAD](https://2030b.com/md/FRONTEND_GUIDE.md)**
+* **`FRONTEND_GUIDE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/FRONTEND_GUIDE.md)**
   * **Purpose:** Defines the frontend technology stack (e.g., Blade, Livewire, Inertia.js) and component structure.
   * **Agent Action:** Generate Blade components, Livewire classes, or Vue/React components strictly according to this spec.
 
 ### 2.4. Quality, Security, & Deployment
 
-* **`TESTING_GUIDE.md`** | **[DOWNLOAD](https://2030b.com/md/TESTING_GUIDE.md)**
+* **`TESTING_GUIDE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/TESTING_GUIDE.md)**
   * **Purpose:** Mandates the testing strategy, tools, and coverage requirements.
   * **Agent Action:** For every generated PHP class (Model, Service, Controller, etc.), you **MUST** also generate a corresponding **Unit or Feature test file**.
 
@@ -97,28 +97,28 @@ The following files contain the absolute requirements. They are listed in order 
 > 
 > The platform includes both PHPUnit and Pest testing frameworks. All generated code must include comprehensive test coverage using these frameworks with proper factory and seeder integration.
 
-* **`SECURITY_GUIDE.md`** | **[DOWNLOAD](https://2030b.com/md/SECURITY_GUIDE.md)**
+* **`SECURITY_GUIDE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/SECURITY_GUIDE.md)**
   * **Purpose:** Security protocols and best practices (auth, validation, injection protection).
   * **Agent Action:** This is a **CHECKLIST**. Review all generated code against this guide. Implement mass assignment protection, auth checks, and input sanitization.
 
-* **`PERFORMANCE_GUIDE.md`** | **[DOWNLOAD](https://2030b.com/md/PERFORMANCE_GUIDE.md)**
+* **`PERFORMANCE_GUIDE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/PERFORMANCE_GUIDE.md)**
   * **Purpose:** Performance optimization rules (caching, eager loading, indexing).
   * **Agent Action:** Implement eager loading, caching, and indexing strategies as specified in all database-related code.
 
-* **`MIGRATION_GUIDE.md`** | **[DOWNLOAD](https://2030b.com/md/MIGRATION_GUIDE.md)**
+* **`MIGRATION_GUIDE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/MIGRATION_GUIDE.md)**
   * **Purpose:** Instructions for local (Windows) and production (2030b.com) environment setup.
   * **Agent Action:** Ensure generated code is compatible with both environments (e.g., file paths, filesystem considerations).
 
-* **`DIRECTORY_STRUCTURE.md`** | **[DOWNLOAD](https://2030b.com/md/DIRECTORY_STRUCTURE.md)**
+* **`DIRECTORY_STRUCTURE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/DIRECTORY_STRUCTURE.md)**
   * **Purpose:** Defines the local development project structure.
 
-* **`PRODUCTION_DIRECTORY_STRUCTURE.md`** | **[DOWNLOAD](https://2030b.com/md/PRODUCTION_DIRECTORY_STRUCTURE.md)**
+* **`PRODUCTION_DIRECTORY_STRUCTURE.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/PRODUCTION_DIRECTORY_STRUCTURE.md)**
   * **Purpose:** Defines the production server (2030b.com) directory structure and permissions.
   * **Agent Action:** Place all generated files in the **exact paths** specified in these documents.
 
 ### 2.5. Business Logic & User Experience Context
 
-* **`USER_JOURNEY_ANALYSIS.md`** | **[DOWNLOAD](https://2030b.com/md/USER_JOURNEY_ANALYSIS.md)**
+* **`USER_JOURNEY_ANALYSIS.md`** | **[DOWNLOAD](https://github.com/2030bc/2030bc/blob/main/USER_JOURNEY_ANALYSIS.md)**
   * **Purpose:** Defines user personas, their goals, and the flow of interactions with the platform. Provides crucial business context.
   * **Agent Action:** **CONSULT FOR CONTROLLERS, SERVICES, AND POLICIES.** This file provides the "why" behind the code. Use it to inform method logic, access control rules (`Policies`), and the sequence of operations within `Services`. If a journey requires a "preview" step, ensure the corresponding Service and Policy have the required methods.
 
@@ -298,4 +298,5 @@ All agents have successfully completed their tasks according to the specificatio
 1. Run final quality assurance: `scripts/quality-check.sh`
 2. Execute deployment script: `scripts/deploy.sh`
 3. Verify live functionality at https://2030b.com
+
 4. Monitor error logs for any runtime issues
