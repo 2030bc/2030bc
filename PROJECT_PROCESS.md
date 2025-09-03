@@ -14,8 +14,8 @@ This document outlines the complete, best-practice workflow for building the pla
 - **Description:** Install Laravel, required packages, and set up environment variables. Laravel Breeze with Blade templates is installed and configured with Tailwind CSS.
 - **PHP Files:** None (initial setup complete)
 - **MD Files to Consult:**
-  - https://2030b.com/md/PACKAGES.md
-  - https://2030b.com/md/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/PACKAGES.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
 - **Test Files:**
   - scripts/quality-check.sh (checks installation, PHP version, Composer, NPM)
 
@@ -34,13 +34,13 @@ This document outlines the complete, best-practice workflow for building the pla
 - **Description:** Review all architecture, schema, and process documentation to ensure alignment with installed packages and executed migrations.
 - **PHP Files:** None (planning phase)
 - **MD Files to Consult:**
-  - https://2030b.com/md/ARCHITECTURE_DECISIONS.md
-  - https://2030b.com/md/PROJECT_GUIDE.md
-  - https://2030b.com/md/DATABASE_SCHEMA_V2.md
-  - https://2030b.com/md/PROJECT_DIRECTORY_STRUCTURE.md
-  - https://2030b.com/md/APP_ENUM.md
-  - https://2030b.com/md/APP_DTO.md
-  - https://2030b.com/md/APP_MODEL.md
+  - https://github.com/2030bc/2030bc/blob/main/ARCHITECTURE_DECISIONS.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/DATABASE_SCHEMA_V2.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_DIRECTORY_STRUCTURE.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_ENUM.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_DTO.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_MODEL.md
 - **Test Files:** None
 
 > **Update: Executed Migrations Status**
@@ -65,8 +65,8 @@ This document outlines the complete, best-practice workflow for building the pla
   - database/migrations/* (custom business logic tables only)
   - database/seeders/* (seeders for languages, currencies, user levels, etc.)
 - **MD Files to Consult:**
-  - https://2030b.com/md/DATABASE_SCHEMA_V2.md
-  - https://2030b.com/md/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/DATABASE_SCHEMA_V2.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
 - **Test Files:**
   - tests/Feature/Database/MigrationTest.php (tests migration up/down)
   - tests/Feature/Database/SeederTest.php (tests seeder data integrity)
@@ -84,9 +84,9 @@ This document outlines the complete, best-practice workflow for building the pla
   - app/Enums/* (all enums listed in APP_ENUM.md)
   - app/DTOs/* (all DTOs listed in APP_DTO.md)
 - **MD Files to Consult:**
-  - https://2030b.com/md/APP_ENUM.md
-  - https://2030b.com/md/APP_DTO.md
-  - https://2030b.com/md/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_ENUM.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_DTO.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
 - **Test Files:**
   - tests/Unit/Enums/EnumTest.php (tests enum values and mappings)
   - tests/Unit/DTOs/DTOTest.php (tests DTO instantiation and validation)
@@ -104,9 +104,10 @@ This document outlines the complete, best-practice workflow for building the pla
 - **PHP Files:**
   - app/Models/* (all models listed in APP_MODEL.md)
 - **MD Files to Consult:**
-  - https://2030b.com/md/APP_MODEL.md
-  - https://2030b.com/md/DATABASE_SCHEMA_V2.md
-  - https://2030b.com/md/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_MODEL.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_ENUM.md
+  - https://github.com/2030bc/2030bc/blob/main/DATABASE_SCHEMA_V2.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
 - **Test Files:**
   - tests/Unit/Models/* (one test per model, tests relationships and methods)
 
@@ -128,9 +129,9 @@ This document outlines the complete, best-practice workflow for building the pla
 - **PHP Files:**
   - app/Services/* (by domain: User, Course, Payment, Affiliate, etc.)
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
-  - https://2030b.com/md/APP_DTO.md
-  - https://2030b.com/md/APP_MODEL.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_DTO.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_MODEL.md
 - **Test Files:**
   - tests/Unit/Services/* (tests service logic and edge cases)
 
@@ -146,8 +147,8 @@ This document outlines the complete, best-practice workflow for building the pla
 - **PHP Files:**
   - app/Http/Requests/* (by domain and feature)
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
-  - https://2030b.com/md/APP_DTO.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_DTO.md
 - **Test Files:**
   - tests/Feature/Requests/* (tests validation rules and error messages)
 
@@ -167,7 +168,7 @@ This document outlines the complete, best-practice workflow for building the pla
 - **PHP Files:**
   - app/Http/Middleware/*
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
 - **Test Files:**
   - tests/Feature/Middleware/* (tests middleware logic and edge cases)
 
@@ -184,7 +185,7 @@ This document outlines the complete, best-practice workflow for building the pla
   - app/Policies/*
   - AuthServiceProvider.php
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
 - **Test Files:**
   - tests/Feature/Policies/* (tests policy logic and permissions)
 
@@ -204,8 +205,8 @@ This document outlines the complete, best-practice workflow for building the pla
 - **PHP Files:**
   - app/Http/Resources/* (by domain and feature)
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
-  - https://2030b.com/md/APP_DTO.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_DTO.md
 - **Test Files:**
   - tests/Feature/Resources/* (tests resource output formatting)
 
@@ -221,9 +222,9 @@ This document outlines the complete, best-practice workflow for building the pla
 - **PHP Files:**
   - app/Http/Controllers/* (by domain and feature)
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
-  - https://2030b.com/md/APP_MODEL.md
-  - https://2030b.com/md/APP_DTO.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_MODEL.md
+  - https://github.com/2030bc/2030bc/blob/main/APP_DTO.md
 - **Test Files:**
   - tests/Feature/Controllers/* (tests controller endpoints and responses)
 
@@ -240,7 +241,7 @@ This document outlines the complete, best-practice workflow for building the pla
   - routes/web.php, api.php, admin.php, etc.
   - config/*
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
 - **Test Files:**
   - tests/Feature/Routes/RouteTest.php (tests route accessibility, middleware, and binding)
 
@@ -263,8 +264,8 @@ This document outlines the complete, best-practice workflow for building the pla
   - resources/js/*
   - resources/css/*
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
-  - https://2030b.com/md/FRONTEND_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/FRONTEND_GUIDE.md
 - **Test Files:**
   - tests/Browser/* (Dusk tests for critical user flows)
 
@@ -286,10 +287,10 @@ This document outlines the complete, best-practice workflow for building the pla
   - scripts/quality-check.sh
   - scripts/deploy.sh
 - **MD Files to Consult:**
-  - https://2030b.com/md/PROJECT_GUIDE.md
-  - https://2030b.com/md/TESTING_GUIDE.md
-  - https://2030b.com/md/PERFORMANCE_GUIDE.md
-  - https://2030b.com/md/SECURITY_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/PROJECT_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/TESTING_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/PERFORMANCE_GUIDE.md
+  - https://github.com/2030bc/2030bc/blob/main/SECURITY_GUIDE.md
 - **Test Files:**
   - All tests above, plus:
   - tests/Benchmark/PerformanceTest.php (performance)
@@ -312,4 +313,5 @@ This document outlines the complete, best-practice workflow for building the pla
 > 
 > **Security First:** Notice that the Security Foundation (Middleware & Policies) is built *before* the Controllers and Routes. This prevents writing insecure code and having to refactor it later.
 > 
+
 > **Package Integration:** All steps now account for the installed package stack including Laravel Breeze, Spatie packages, payment processors, and testing frameworks. Ensure proper integration and configuration at each phase.
