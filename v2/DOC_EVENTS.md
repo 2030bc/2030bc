@@ -1,6 +1,6 @@
 # DOC_EVENTS.md
 
-Events are domain events that represent something meaningful that happened in the application. They enable decoupled communication between different parts of the system using Laravel's event system.
+Events are domain events that represent something meaningful that happened in the application. They enable decoupled communication between different parts of the system using Laravel's event system. Updated.
 
 ## app/Events/Handler.php
 
@@ -57,6 +57,11 @@ use App\Models\Course\Episode;
 use App\Events\Contracts\DomainEventInterface;
 ```
 
+**Handled By Listeners**
+- UpdateUserProgress (tracks episode completion progress)
+- AwardPointsForCompletion (awards completion points)
+- UpdateCourseMetrics (updates course statistics)
+
 **Methods**
 - __construct()
 - broadcastOn()
@@ -99,6 +104,10 @@ use App\Models\User;
 use App\Models\User\UserLevel;
 use App\Enums\UserLevel as UserLevelEnum;
 ```
+
+**Handled By Listeners**
+- SendAffiliateNotification (notifies about commission rate changes)
+- LogUserActivity (logs level change activity)
 
 **Methods**
 - __construct()
@@ -144,6 +153,10 @@ use App\Enums\PaymentStatus;
 use App\Enums\TransactionType;
 ```
 
+**Handled By Listeners**
+- HandlePaymentSuccess (processes enrollment and access)
+- ProcessCommissionPayment (handles affiliate commissions)
+
 **Methods**
 - __construct()
 - broadcastOn()
@@ -186,6 +199,10 @@ use App\Models\User;
 use App\Enums\ConversionType;
 ```
 
+**Handled By Listeners**
+- ProcessCommissionPayment (processes affiliate commissions)
+- SendAffiliateNotification (notifies affiliate of conversion)
+
 **Methods**
 - __construct()
 - getCommissionAmount()
@@ -227,6 +244,10 @@ use App\Models\User;
 use App\Enums\CourseStatus;
 ```
 
+**Handled By Listeners**
+- SendBulkNotifications (notifies interested users)
+- UpdateCourseMetrics (updates course catalogs)
+
 **Methods**
 - __construct()
 - broadcastOn()
@@ -266,6 +287,11 @@ use Illuminate\Foundation\Events\Dispatchable;
 use App\Models\User;
 use App\Models\Affiliate\ReferralCode;
 ```
+
+**Handled By Listeners**
+- SendEmailVerificationNotification (sends verification email)
+- SendNewUserNotification (notifies administrators)
+- LogUserActivity (logs registration activity)
 
 **Methods**
 - __construct()
@@ -309,6 +335,10 @@ use App\Models\Payment\Currency;
 use App\Enums\CommissionStatus;
 ```
 
+**Handled By Listeners**
+- ProcessCommissionPayment (processes commission payouts)
+- SendAffiliateNotification (notifies affiliate of earnings)
+
 **Methods**
 - __construct()
 - calculateTax()
@@ -334,7 +364,55 @@ use App\Enums\CommissionStatus;
 ❌ Don't skip tax compliance
 ❌ Don't create duplicate payouts
 
-## 2030b/app/Events/Contracts/DomainEventInterface.php
+---
+
+## Missing Events Referenced in Listeners
+
+### ConversionApproved Event
+**Referenced By**: ProcessCommissionPayment listener
+**Status**: Missing from events documentation
+**Required Properties**: $conversion, $approvalTimestamp, $approver
+
+### PaymentSucceeded Event
+**Referenced By**: HandlePaymentSuccess listener
+**Status**: Missing from events documentation
+**Required Properties**: $transaction, $paymentProvider, $confirmationCode
+
+### ConversionCreated Event
+**Referenced By**: SendAffiliateNotification listener
+**Status**: Missing from events documentation
+**Required Properties**: $conversion, $affiliate, $referralSource
+
+### CommissionPaid Event
+**Referenced By**: SendAffiliateNotification listener
+**Status**: Missing from events documentation
+**Required Properties**: $commission, $affiliate, $paymentDetails
+
+---
+
+## Event-Listener Mapping Matrix
+
+| Event | Listeners |
+|-------|-----------|
+| EpisodeCompleted | UpdateUserProgress, AwardPointsForCompletion, UpdateCourseMetrics |
+| UserLevelChanged | SendAffiliateNotification, LogUserActivity |
+| PaymentProcessed | HandlePaymentSuccess, ProcessCommissionPayment |
+| ReferralCompleted | ProcessCommissionPayment, SendAffiliateNotification |
+| CoursePublished | SendBulkNotifications, UpdateCourseMetrics |
+| UserRegistered | SendEmailVerificationNotification, SendNewUserNotification, LogUserActivity |
+| AffiliateCommissionEarned | ProcessCommissionPayment, SendAffiliateNotification |
+| ConversionApproved* | ProcessCommissionPayment |
+| PaymentSucceeded* | HandlePaymentSuccess |
+| ConversionCreated* | SendAffiliateNotification |
+| CommissionPaid* | SendAffiliateNotification |
+
+*Events marked with asterisk are referenced in listeners but missing from events documentation
+
+---
+
+## Event Contracts Implementation
+
+### app/Events/Contracts/DomainEventInterface.php
 
 **Purpose**: Defines the contract for domain events that represent significant business state changes within the application's domain layer.
 
@@ -366,7 +444,9 @@ use Ramsey\Uuid\UuidInterface;
 - Don't couple events to infrastructure concerns
 - Don't create events for trivial state changes
 
-## 2030b/app/Events/Contracts/ShouldBroadcastInterface.php
+---
+
+## app/Events/Contracts/ShouldBroadcastInterface.php
 
 **Purpose**: Contract for events that should be broadcast to real-time channels using Laravel's broadcasting system.
 
@@ -397,7 +477,9 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 - Don't broadcast every event unnecessarily
 - Don't ignore channel authorization
 
-## 2030b/app/Events/Contracts/ShouldQueueInterface.php
+---
+
+## app/Events/Contracts/ShouldQueueInterface.php
 
 **Purpose**: Contract for events that should be processed asynchronously through the queue system for performance optimization.
 
@@ -427,7 +509,9 @@ use Illuminate\Queue\SerializesModels;
 - Don't use default queue for all operations
 - Don't queue without proper serialization
 
-## 2030b/app/Events/Contracts/EventHandlerInterface.php
+---
+
+## app/Events/Contracts/EventHandlerInterface.php
 
 **Purpose**: Defines the contract for event handlers that process domain events and coordinate side effects.
 
@@ -456,3 +540,36 @@ use Illuminate\Support\Facades\DB;
 - Don't ignore event handling failures
 - Don't process events synchronously in web requests
 - Don't couple handlers to specific event implementations
+
+---
+
+## EventServiceProvider Registration
+
+The EventServiceProvider should include the following event-listener mappings:
+
+```php
+protected $listen = [
+    'App\Events\EpisodeCompleted' => [
+        'App\Listeners\UpdateUserProgress',
+        'App\Listeners\AwardPointsForCompletion',
+        'App\Listeners\UpdateCourseMetrics',
+    ],
+    'App\Events\UserRegistered' => [
+        'App\Listeners\SendEmailVerificationNotification',
+        'App\Listeners\SendNewUserNotification',
+        'App\Listeners\LogUserActivity',
+    ],
+    'App\Events\PaymentProcessed' => [
+        'App\Listeners\HandlePaymentSuccess',
+        'App\Listeners\ProcessCommissionPayment',
+    ],
+    'App\Events\ReferralCompleted' => [
+        'App\Listeners\ProcessCommissionPayment',
+        'App\Listeners\SendAffiliateNotification',
+    ],
+    'App\Events\AffiliateCommissionEarned' => [
+        'App\Listeners\ProcessCommissionPayment',
+        'App\Listeners\SendAffiliateNotification',
+    ],
+];
+```
