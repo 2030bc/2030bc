@@ -1,7 +1,389 @@
 # DOC_AUTHORIZATION_CORE.md
 
 ## Overview
-The Authorization Core component implements the CQRS (Command Query Responsibility Segregation) pattern to separate read and write operations in the Laravel docu-course platform. This component provides a clean architectural separation between commands that modify state and queries that retrieve data.
+The Authorization Core provides a comprehensive, multi-layered security architecture for the Laravel docu-course platform, integrating CQRS patterns, Spatie Permission package, Laravel policies, middleware security, and the 14-level user progression system. This unified authorization framework ensures consistent, secure, and scalable access control across all application layers. Updated.
+
+---
+
+## Multi-Layer Authorization Architecture
+
+### Layer 1: Authentication & Identity
+**Foundation Layer** - Establishes user identity and session management
+
+**Components**:
+- **Laravel Breeze**: Web-based authentication scaffolding
+- **Laravel Sanctum**: API token-based authentication
+- **Two-Factor Authentication**: Google2FA integration for enhanced security
+- **Social Authentication**: OAuth integration via Laravel Socialite
+
+**Integration Points**:
+- User model with HasApiTokens trait for Sanctum integration
+- AuthService for centralized authentication logic
+- Session management with secure cookie configuration
+- Password policies enforced through StrongPassword validation rule
+
+### Layer 2: Role-Based Access Control (Spatie Permission)
+**Permission Layer** - Defines roles, permissions, and assignments
+
+**Spatie Integration Components**:
+```php
+// Core Spatie models and traits
+Spatie\Permission\Models\Role
+Spatie\Permission\Models\Permission
+Spatie\Permission\Traits\HasRoles (User model)
+Spatie\Permission\Traits\HasPermissions (User model)
+```
+
+**Permission Matrix**:
+- **Super Administrator**: All system permissions, configuration access
+- **Administrator**: User management, content moderation, system monitoring
+- **Moderator**: Content review, user support, basic administration
+- **Instructor**: Course creation, student management, analytics access
+- **Premium User**: Enhanced features, priority support, advanced tools
+- **Standard User**: Basic platform access, course enrollment, progress tracking
+
+**Role Hierarchy Implementation**:
+```php
+// Role inheritance structure
+Super Administrator → Administrator → Moderator → Instructor → Premium User → Standard User
+```
+
+**Service Integration**:
+- **PermissionService**: Creates, assigns, and manages permissions
+- **RoleService**: Handles role assignments and hierarchy management
+- **User model methods**: hasPermissionTo(), assignRole(), syncRoles()
+
+### Layer 3: User Progression System
+**Level-Based Layer** - 14-level user advancement system affecting access rights
+
+**Level-Based Access Control**:
+- **Levels 1-3 (Novice)**: Basic course access, limited upload quotas (100MB)
+- **Levels 4-6 (Intermediate)**: Enhanced features, increased quotas (250MB)
+- **Levels 7-10 (Advanced)**: Course creation abilities, instructor features (500MB)
+- **Levels 11-14 (Expert/VIP)**: Premium content access, maximum benefits (1GB)
+
+**Service Integration**:
+- **LevelService**: Calculates levels, manages progression, distributes rewards
+- **User progression tracking**: Points accumulation and level advancement
+- **Feature unlocking**: Progressive feature access based on user levels
+
+### Layer 4: Laravel Policy System
+**Resource-Level Layer** - Fine-grained resource access control
+
+**Policy Integration Matrix**:
+- **UserPolicy**: Profile management, administrative actions, role assignments
+- **DocuCoursePolicy**: Course access, enrollment validation, content viewing
+- **EpisodePolicy**: Episode access, progress tracking, note creation
+- **TransactionPolicy**: Payment access, refund processing, financial reporting
+- **AffiliatePolicy**: Commission tracking, payout requests, fraud prevention
+- **MediaPolicy**: File access, upload permissions, storage quota enforcement
+
+**Authorization Gate Registration**:
+```php
+// AuthServiceProvider integration
+Gate::resource('courses', DocuCoursePolicy::class);
+Gate::define('admin.panel', [UserPolicy::class, 'accessAdminPanel']);
+Gate::before(function ($user, $ability) {
+    return $user->hasRole('Super Administrator') ? true : null;
+});
+```
+
+### Layer 5: Middleware Security
+**Request-Level Layer** - HTTP request filtering and validation
+
+**Authorization Middleware Chain**:
+- **CheckPermission**: Validates specific permissions using Spatie package
+- **CheckRole**: Enforces role-based access with hierarchy support
+- **CheckUserLevel**: Validates user progression requirements
+- **ValidateCourseAccess**: Course-specific access validation
+- **ValidateOwnership**: Resource ownership verification
+- **RateLimitableMiddleware**: API rate limiting and throttling
+
+**Middleware Integration Pattern**:
+```php
+// Route group with layered authorization
+Route::middleware(['auth', 'verified', 'permission:courses.create', 'user.level:7'])
+    ->group(function () {
+        Route::post('/courses', [CourseController::class, 'store']);
+    });
+```
+
+### Layer 6: Service-Level Authorization
+**Business Logic Layer** - Service method authorization
+
+**Authorization Pattern in Services**:
+```php
+// Service-level authorization example
+public function createCourse(CreateCourseDTO $dto, User $user): Course
+{
+    // Multi-layer authorization check
+    if (!$user->hasPermissionTo('courses.create')) {
+        throw new UnauthorizedException('Insufficient permissions');
+    }
+    
+    if (!$this->levelService->checkLevelAccess($user->id, 'course_creation')) {
+        throw new InsufficientLevelException('Minimum level 7 required');
+    }
+    
+    // Business logic continues...
+}
+```
+
+**Service Authorization Integration**:
+- **CourseService**: Enrollment validation, access level checks
+- **PaymentService**: Transaction authorization, financial access
+- **AffiliateService**: Commission access, payout authorization
+- **UserService**: Profile management, administrative operations
+
+---
+
+## CQRS Authorization Implementation
+
+### Command Authorization
+**Write Operations** - Commands that modify system state
+
+**Command Handler Authorization Pattern**:
+```php
+abstract class AuthorizedCommandHandler implements CommandHandlerInterface
+{
+    protected function authorize(User $user, string $permission): void
+    {
+        if (!$user->hasPermissionTo($permission)) {
+            throw new UnauthorizedException();
+        }
+    }
+    
+    protected function authorizeOwnership(User $user, Model $resource): void
+    {
+        if ($resource->user_id !== $user->id && !$user->hasRole('Administrator')) {
+            throw new OwnershipException();
+        }
+    }
+}
+```
+
+**Command Authorization Examples**:
+- **CreateCourseCommand**: Requires 'courses.create' permission and minimum level 7
+- **UpdateUserCommand**: Requires ownership or 'users.update' permission
+- **ProcessPaymentCommand**: Requires transaction ownership or 'payments.process' permission
+- **AssignRoleCommand**: Requires 'roles.assign' permission and role hierarchy validation
+
+### Query Authorization
+**Read Operations** - Queries that retrieve system data
+
+**Query Handler Authorization Pattern**:
+```php
+abstract class AuthorizedQueryHandler implements QueryHandlerInterface
+{
+    protected function authorizeRead(User $user, string $permission): void
+    {
+        if (!$user->hasPermissionTo($permission)) {
+            throw new UnauthorizedException();
+        }
+    }
+    
+    protected function filterByAccess(User $user, Collection $resources): Collection
+    {
+        return $resources->filter(function ($resource) use ($user) {
+            return $this->canAccess($user, $resource);
+        });
+    }
+}
+```
+
+**Query Authorization Examples**:
+- **GetUserQuery**: Filters users based on privacy settings and administrative access
+- **GetCoursesQuery**: Filters courses by access level, enrollment status, and publication state
+- **GetTransactionsQuery**: Restricts to owned transactions unless administrative access
+- **GetAnalyticsQuery**: Requires appropriate reporting permissions and data access levels
+
+---
+
+## API Authorization Architecture
+
+### Sanctum Token Management
+**API Authentication** - Token-based API access control
+
+**Token Scopes and Abilities**:
+```php
+// Token creation with specific abilities
+$user->createToken('course-management', [
+    'courses:read',
+    'courses:create',
+    'episodes:read',
+    'episodes:update'
+])->plainTextToken;
+```
+
+**API Authorization Middleware**:
+- **auth:sanctum**: Validates API tokens and establishes user context
+- **ability:permission**: Checks token abilities for specific actions
+- **throttle:api**: Rate limiting for API endpoints
+- **api.auth**: Custom API authentication middleware
+
+### API Gateway Authorization
+**External Access Control** - Third-party API access management
+
+**API Key Management**:
+- **API keys**: Generated for external integrations
+- **Rate limiting**: Per-key rate limits and quotas
+- **Scope restrictions**: Limited access to specific endpoints
+- **Usage tracking**: API usage analytics and billing integration
+
+---
+
+## Course Access Control System
+
+### Content Access Matrix
+**Multi-Dimensional Access Control** - Course content access based on multiple factors
+
+**Access Dimensions**:
+1. **User Level**: Minimum progression level required
+2. **Payment Status**: Free, premium, or VIP content
+3. **Enrollment Status**: Enrolled, guest, or preview access
+4. **Publication Status**: Published, draft, or preview content
+5. **Geographic Restrictions**: Region-based content availability
+
+**Access Validation Logic**:
+```php
+public function validateCourseAccess(User $user, Course $course): bool
+{
+    // Level requirement check
+    if ($course->min_level > $user->level) {
+        return false;
+    }
+    
+    // Payment validation for premium content
+    if ($course->isPremium() && !$user->hasPaidAccess($course)) {
+        return false;
+    }
+    
+    // Enrollment requirement
+    if ($course->requiresEnrollment() && !$user->isEnrolled($course)) {
+        return false;
+    }
+    
+    return true;
+}
+```
+
+### Progressive Content Unlocking
+**Sequential Access Control** - Episode-by-episode progression
+
+**Unlock Criteria**:
+- **Sequential completion**: Previous episodes must be completed
+- **Time restrictions**: Minimum time spent on previous content
+- **Assessment requirements**: Quizzes or evaluations must be passed
+- **Engagement thresholds**: Minimum engagement metrics achieved
+
+---
+
+## Affiliate Authorization System
+
+### Commission Access Control
+**Financial Authorization** - Commission and payout access management
+
+**Authorization Levels**:
+- **Affiliate View**: Own commission data and basic analytics
+- **Affiliate Admin**: Team commission management and advanced reporting
+- **Financial Admin**: All commission data and payout processing
+- **Compliance Officer**: Audit access and regulatory reporting
+
+**Fraud Prevention Authorization**:
+- **Identity verification**: Enhanced authentication for financial operations
+- **Behavioral analysis**: Suspicious activity detection and authorization holds
+- **Compliance checks**: Regulatory compliance validation for payouts
+- **Multi-factor approval**: Enhanced authorization for large transactions
+
+---
+
+## Security Integration & Compliance
+
+### Audit & Logging Integration
+**Security Monitoring** - Comprehensive authorization event logging
+
+**Spatie ActivityLog Integration**:
+```php
+// Automatic authorization logging
+activity('authorization')
+    ->causedBy($user)
+    ->performedOn($resource)
+    ->withProperties([
+        'permission' => $permission,
+        'role' => $user->getRoleNames(),
+        'level' => $user->level,
+        'result' => $authorized
+    ])
+    ->log($authorized ? 'authorized' : 'denied');
+```
+
+**Security Event Types**:
+- **Permission grants/denials**: All permission check results
+- **Role assignments**: Role changes and assignments
+- **Level progressions**: User level advancement events
+- **Access violations**: Unauthorized access attempts
+- **Administrative actions**: Administrative authorization events
+
+### Rate Limiting & Throttling
+**Abuse Prevention** - Authorization-aware rate limiting
+
+**Rate Limiting Strategies**:
+- **User-level limits**: Different limits based on user roles and levels
+- **Permission-based throttling**: Enhanced limits for privileged operations
+- **Geographic restrictions**: Region-based access control and limiting
+- **Temporal restrictions**: Time-based access windows and scheduling
+
+---
+
+## Testing & Quality Assurance
+
+### Authorization Testing Framework
+**Security Validation** - Comprehensive authorization testing
+
+**Test Categories**:
+- **Permission Tests**: Spatie permission integration validation
+- **Policy Tests**: Laravel policy authorization verification
+- **Level Tests**: User progression access control testing
+- **Integration Tests**: Multi-layer authorization workflow testing
+- **Security Tests**: Authorization bypass and vulnerability testing
+
+**Test Coverage Requirements**:
+- **95% coverage**: All authorization decision paths
+- **Edge case testing**: Boundary conditions and error scenarios
+- **Performance testing**: Authorization decision latency benchmarking
+- **Security auditing**: Regular penetration testing and vulnerability assessment
+
+### Authorization Monitoring
+**Runtime Security** - Production authorization monitoring
+
+**Monitoring Metrics**:
+- **Authorization success rates**: Permission grant/denial ratios
+- **Performance metrics**: Authorization decision latency tracking
+- **Security incidents**: Failed authorization attempt patterns
+- **Usage analytics**: Permission and role usage statistics
+- **Compliance reporting**: Regulatory compliance metric tracking
+
+---
+
+## Best Practices & Implementation Guidelines
+
+### Security Principles
+- **Defense in Depth**: Multiple authorization layers for critical operations
+- **Principle of Least Privilege**: Minimum necessary permissions granted
+- **Fail Secure**: Authorization failures default to denial
+- **Audit Everything**: Comprehensive logging of authorization decisions
+
+### Performance Optimization
+- **Permission Caching**: Strategic caching of frequently checked permissions
+- **Role Hierarchy Optimization**: Efficient role inheritance checking
+- **Query Optimization**: Minimized database queries for authorization
+- **Lazy Loading**: Efficient loading of user roles and permissions
+
+### Integration Standards
+- **Consistent Patterns**: Uniform authorization implementation across layers
+- **Service Contracts**: Well-defined interfaces for authorization services
+- **Event Integration**: Authorization events properly integrated with domain events
+- **Error Handling**: Standardized authorization error responses and logging
 
 ---
 
